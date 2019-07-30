@@ -21,9 +21,9 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+$app->withFacades();
 
-// $app->withEloquent();
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -61,9 +61,11 @@ $app->singleton(
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware(
+    [
+        'auth' => App\Http\Middleware\JwtAuth::class,
+    ]
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -91,10 +93,12 @@ $app->singleton(
 |
 */
 
-$app->router->group([
+$app->router->group(
+    [
     'namespace' => 'App\Http\Controllers',
-], function ($router) {
-    require __DIR__.'/../routes/web.php';
-});
+    ], function ($router) {
+        require __DIR__.'/../routes/web.php';
+    }
+);
 
 return $app;
