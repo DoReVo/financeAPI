@@ -198,20 +198,31 @@ class TransactionController extends Controller
         }
     }
 
-    public function editTransaction($column, $id, Request $request)
+    public function editTransaction(Request $request)
     {
 
         // 1.ERROR HANDLING FOR DELETED RECORD
-        $transaction = new Transaction;
+        
 
         try {
-            $transaction = $transaction->findOrFail($id);
-
-            if ($column == 'date_time') {
-                $transaction->date_time = $this->_date;
-            } elseif ($column=='amount') {
-                $transaction->amount = $request->amount;
+            if (!is_numeric($request->route('id'))) {
+                return response('ID IS NOT NUMB', 400);
             }
+
+            // return response($this->_column, 200);
+
+            $transaction = new Transaction;
+            
+            $transaction = $transaction->findOrFail($this->_id);
+
+
+            $transaction[$this->_column] = $request->amount;
+
+            // if ($column == 'date_time') {
+            //     $transaction->date_time = $this->_date;
+            // } elseif ($column=='amount') {
+            //     $transaction->amount = $request->amount;
+            // }
             
             $transaction->save();
 
