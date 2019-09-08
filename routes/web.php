@@ -18,12 +18,38 @@ $router->get('/', function () use ($router) {
 
 $router->group(
     ['prefix'=>'api/'],
-    function () use ($router) {        
-        $router->get('transaction', ['uses' => 'TransactionController@getAllTransaction']);
-        $router->get('transaction/{id}', ['uses' => 'TransactionController@getOneTransaction']);
-        $router->post('transaction', ['uses' => 'TransactionController@createTransaction']);
-        $router->delete('transaction/{id}', ['uses' => 'TransactionController@deleteTransaction']);
-        $router->put('transaction/{id}', ['uses' => 'TransactionController@replaceTransaction']);
-        $router->patch('transaction/{column}/{id}', ['uses'=>'TransactionController@editTransaction']);
+    function () use ($router) {
+        $router->get(
+            'transaction',
+            ['uses' => 'TransactionController@getAllTransaction']
+        );
+        $router->get(
+            'transaction/{id}',
+            ['uses' => 'TransactionController@getOneTransaction']
+        );
+        $router->post(
+            'transaction',
+            ['uses' => 'TransactionController@createTransaction']
+        );
+        $router->delete(
+            'transaction/{id}',
+            ['uses' => 'TransactionController@deleteTransaction']
+        );
+        $router->put(
+            'transaction/{id}',
+            ['uses' => 'TransactionController@replaceTransaction']
+        );
+        $router->patch(
+            'transaction/{id:\d+}/{column:date_time|category|amount}',            
+            ['uses'=>'TransactionController@editTransaction']
+        );
+        // $router->patch(
+        //     'transaction/{id:\d+}/category',            
+        //     ['uses'=>'TransactionController@editTransaction']
+        // );
+        // $router->patch(
+        //     'transaction/{id:\d+}/amount',            
+        //     ['uses'=>'TransactionController@editTransaction']
+        // );
     }
 );
