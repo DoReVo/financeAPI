@@ -18,6 +18,9 @@ class TransactionController extends Controller
     private $_category;
     private $_item;
     private $_detail;
+    private $_column;
+    private $_id;
+    private $_userInput;
 
     public function __construct(Request $request)
     {
@@ -101,6 +104,12 @@ class TransactionController extends Controller
                 $this->_amount = $request->amount;
                 $this->_detail = $request->detail;
                 $this->_item = $request->item;
+            }
+
+            if ($method=='PATCH') {
+                $this->_id = $request->route('id');
+                $this->_column = $request->route('column');
+                $this->_userInput = $request->data;
             }
         } catch (\ValidationException $th) {
             return response($th->getMessage(), 422);
