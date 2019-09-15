@@ -147,11 +147,11 @@ class TransactionController extends Controller
             $transaction->save();
 
             // finance_transaction_detail table
-            if ($this->detail) {
+            
                 $detail = new Detail;
-                $detail->detail = $this->detail;
+            $detail->detail = $this->detail ? $this->detail : null;
                 $transaction->detail()->save($detail);
-            }
+            
 
             //finance_transaction_item table
 
