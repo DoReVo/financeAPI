@@ -175,6 +175,24 @@ class TransactionController extends Controller
         }
     }
 
+    public function createTransactionItem(Request $request, $id)
+    {
+        try {
+            $item = new Item;
+            $item = $item->create(
+                [
+                    'transaction_id' => $id,
+                    'item_name' => $request->item_name,
+                    'item_amount' => $request->item_amount,
+                    'unit_price' => $request->unit_price
+                ]
+            );
+
+            return response($item, 200);
+        } catch (\Throwable $th) {
+            return($th->getMessage());
+        }
+    }
     public function deleteTransaction($id)
     {
         $transaction = new Transaction;
