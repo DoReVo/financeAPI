@@ -31,6 +31,10 @@ $router->group(
             'transaction',
             ['uses' => 'TransactionController@createTransaction']
         );
+        $router->post(
+            'transaction/{id:\d+}/item',
+            ['uses' => 'TransactionController@createTransactionItem']
+        );
         $router->delete(
             'transaction/{id}',
             ['uses' => 'TransactionController@deleteTransaction']
