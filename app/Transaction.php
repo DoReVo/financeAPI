@@ -28,7 +28,7 @@ class Transaction extends Model
     }
 
     public function item()
-    {        
+    {
         return $this->hasMany('App\Item', 'transaction_id', 'id');
     }
 
