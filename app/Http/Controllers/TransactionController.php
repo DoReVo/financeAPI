@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use App\Transaction;
@@ -13,22 +12,18 @@ use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
-    private $_date;
-    private $_amount;
-    private $_category;
-    private $_item;
-    private $_detail;
-    private $_column;
-    private $_id;
-    private $_userInput;
+    private $date;
+    private $amount;
+    private $category;
+    private $item;
+    private $detail;
+    private $column;
+    private $id;
+    private $userInput;
+
 
     public function __construct(Request $request)
     {
-        /**
-         * @__construct
-         *
-         * DO SOMETHING
-         */
 
         try {
             $uri = $request->path();
@@ -99,17 +94,17 @@ class TransactionController extends Controller
                 );
 
                 $dateTime = date_create($request->date_time);
-                $this->_date = date_format($dateTime, 'Y:m:d G:i:s');
-                $this->_category = $request->category;
-                $this->_amount = $request->amount;
-                $this->_detail = $request->detail;
-                $this->_item = $request->item;
+                $this->date = date_format($dateTime, 'Y:m:d G:i:s');
+                $this->category = $request->category;
+                $this->amount = $request->amount;
+                $this->detail = $request->detail;
+                $this->item = $request->item;
             }
 
             if ($method=='PATCH') {
-                $this->_id = $request->route('id');
-                $this->_column = $request->route('column');
-                $this->_userInput = $request->data;
+                $this->id = $request->route('id');
+                $this->column = $request->route('column');
+                $this->userInput = $request->data;
             }
         } catch (\ValidationException $th) {
             return response($th->getMessage(), 422);
@@ -144,28 +139,28 @@ class TransactionController extends Controller
             $transaction = new Transaction;
 
             // 5. SAVE TO DATABASE
-            $transaction->date_time = $this->_date;
-            $transaction->category = $this->_category;
-            $transaction->amount = $this->_amount;
+            $transaction->date_time = $this->date;
+            $transaction->category = $this->category;
+            $transaction->amount = $this->amount;
 
             // finance_transaction table
             $transaction->save();
 
             // finance_transaction_detail table
-            if ($this->_detail) {
+            if ($this->detail) {
                 $detail = new Detail;
-                $detail->detail = $this->_detail;
+                $detail->detail = $this->detail;
                 $transaction->detail()->save($detail);
             }
 
             //finance_transaction_item table
 
-            if ($this->_item) {
+            if ($this->item) {
                 $itemArray = array();
     
-                foreach ($this->_item as $rowKey => $rowValue) {
+                foreach ($this->item as $rowKey => $rowValue) {
                     $item = new Item;
-                    foreach ($this->_item[$rowKey] as $colKey => $colValue) {
+                    foreach ($this->item[$rowKey] as $colKey => $colValue) {
                         $item->$colKey = $colValue;
                     }
                     array_push($itemArray, $item);
@@ -209,17 +204,17 @@ class TransactionController extends Controller
                 return response('ID IS NOT NUMB', 400);
             }
 
-            // return response($this->_column, 200);
+            // return response($this->column, 200);
 
             $transaction = new Transaction;
             
-            $transaction = $transaction->findOrFail($this->_id);
+            $transaction = $transaction->findOrFail($this->id);
 
 
-            $transaction[$this->_column] = $request->amount;
+            $transaction[$this->column] = $request->amount;
 
             // if ($column == 'date_time') {
-            //     $transaction->date_time = $this->_date;
+            //     $transaction->date_time = $this->date;
             // } elseif ($column=='amount') {
             //     $transaction->amount = $request->amount;
             // }
@@ -241,7 +236,7 @@ class TransactionController extends Controller
             $transaction = $transaction->findOrFail($id);
 
             $transaction->update(
-                ['date_time' => $this->_date,
+                ['date_time' => $this->date,
                 'amount' => $request->amount]
             );
 
