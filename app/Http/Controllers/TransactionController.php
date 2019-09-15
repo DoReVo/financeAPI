@@ -220,27 +220,26 @@ class TransactionController extends Controller
         }
             }
 
-            // return response($this->column, 200);
-
+    // Transaction Detail editing
+    public function editTransactionDetail(Request $request, $id)
+    {
+        $this->id = $id;
             $transaction = new Transaction;
+        $transaction = $transaction->find($id);
             
-            $transaction = $transaction->findOrFail($this->id);
-
-
-            $transaction[$this->column] = $request->amount;
-
-            // if ($column == 'date_time') {
-            //     $transaction->date_time = $this->date;
-            // } elseif ($column=='amount') {
-            //     $transaction->amount = $request->amount;
-            // }
-            
-            $transaction->save();
-
-            return response($transaction);
-        } catch (\Throwable $th) {
-            return $th->getMessage();
+        // If Id does not exist
+        if (!$transaction) {
+            return response(json_encode('ID does not exist'), 422);
+            // return $this->id;
         }
+
+        $detail = new Detail;
+        $detail = $detail->find($id);
+            
+        $detail->detail = $this->detail;
+        $detail->save();
+
+        return response($detail);
     }
 
     public function replaceTransaction($id, Request $request)
