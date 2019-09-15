@@ -101,7 +101,33 @@ class TransactionController extends Controller
                 $this->item = $request->item;
             }
 
-            if ($method=='PATCH') {
+            if ($method == 'POST' && preg_match('/api\/transaction\/\d+\/item/', $uri)) {
+                $this->validate(
+                    $request,
+                    [
+                        
+                        'item_name' =>[
+                            'bail',
+                            'required',
+                            'string'
+                        ],
+                        'item_amount'=>[
+                            'bail',
+                            'required',
+                            'numeric',
+                            'int',
+                            'gte:0'
+                        ],
+                        'unit_price'=>[
+                            'bail',
+                            'required',
+                            'numeric',
+                            'gte:0'
+                        ]
+                    ]
+                );
+            }
+
                 $this->id = $request->route('id');
                 $this->column = $request->route('column');
                 $this->userInput = $request->data;
