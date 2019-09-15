@@ -195,13 +195,29 @@ class TransactionController extends Controller
 
     public function editTransaction(Request $request)
     {
-
-        // 1.ERROR HANDLING FOR DELETED RECORD
-        
-
         try {
-            if (!is_numeric($request->route('id'))) {
-                return response('ID IS NOT NUMB', 400);
+            // Find if ID exist
+            $transaction = new Transaction;
+            $transaction = $transaction->find($this->id);
+
+            // Return error if ID not exist
+            if (!$transaction) {
+                return response(json_encode('ID does not exist'), 422);
+            }
+
+            // Set new data on user defined column based on route
+            $transaction[$this->column] = $this->userInput;
+
+            $transaction->save();
+        
+            // Return updated value only
+            $updatedValue[$this->column] = $transaction[$this->column];
+
+            return response($updatedValue);
+            // return response($request->path());
+        } catch (\Throwable $th) {
+            return $th->getMessage();
+        }
             }
 
             // return response($this->column, 200);
