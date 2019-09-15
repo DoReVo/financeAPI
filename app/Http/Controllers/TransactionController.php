@@ -24,13 +24,13 @@ class TransactionController extends Controller
 
     public function __construct(Request $request)
     {
-
         try {
             $uri = $request->path();
             $method = $request->method();
 
             // IF USER IS TRYING TO CREATE NEW TRANSACTION
             // 1. VALIDATE DATA , THROW EXCEPTION IF DATA INVALID
+            // Pass a third array argument to validate method to define custom message
             if ($method == "POST" && $uri == "api/transaction") {
                 $this->validate(
                     $request,
@@ -90,7 +90,7 @@ class TransactionController extends Controller
                             'string',
                             'nullable'
                         ]
-                    ]
+                        ]
                 );
 
                 $dateTime = date_create($request->date_time);
@@ -194,6 +194,24 @@ class TransactionController extends Controller
                 // Which column date_time, category or amount
                 $this->column = $request->route('column');
             }
+
+            // If user is editing transaction detail
+            if ($method == 'PATCH' && preg_match('/api\/transaction\/\d+\/detail/', $uri)) {
+                $this->validate(
+                    $request,
+                    [
+                        'data'=>[
+                            'bail',
+                            'required',
+                            'string',
+                            'nullable'
+                        ]
+                    ]
+                );
+
+                $this->detail = $request->data;
+                // $this->id = $request->id;
+                // $this->id = $request->route('id');
             }
         } catch (\ValidationException $th) {
             return response($th->getMessage(), 422);
@@ -237,9 +255,9 @@ class TransactionController extends Controller
 
             // finance_transaction_detail table
             
-                $detail = new Detail;
+            $detail = new Detail;
             $detail->detail = $this->detail ? $this->detail : null;
-                $transaction->detail()->save($detail);
+            $transaction->detail()->save($detail);
             
 
             //finance_transaction_item table
@@ -315,9 +333,9 @@ class TransactionController extends Controller
 
             // Set new data on user defined column based on route
             $transaction[$this->column] = $this->userInput;
-
+            
             $transaction->save();
-        
+
             // Return updated value only
             $updatedValue[$this->column] = $transaction[$this->column];
 
@@ -326,15 +344,15 @@ class TransactionController extends Controller
         } catch (\Throwable $th) {
             return $th->getMessage();
         }
-            }
+    }
 
     // Transaction Detail editing
     public function editTransactionDetail(Request $request, $id)
     {
         $this->id = $id;
-            $transaction = new Transaction;
+        $transaction = new Transaction;
         $transaction = $transaction->find($id);
-            
+
         // If Id does not exist
         if (!$transaction) {
             return response(json_encode('ID does not exist'), 422);
@@ -343,10 +361,10 @@ class TransactionController extends Controller
 
         $detail = new Detail;
         $detail = $detail->find($id);
-            
+
         $detail->detail = $this->detail;
         $detail->save();
-
+        
         return response($detail);
     }
 
