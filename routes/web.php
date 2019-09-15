@@ -43,13 +43,9 @@ $router->group(
             'transaction/{id:\d+}/{column:date_time|category|amount}',            
             ['uses'=>'TransactionController@editTransaction']
         );
-        // $router->patch(
-        //     'transaction/{id:\d+}/category',            
-        //     ['uses'=>'TransactionController@editTransaction']
-        // );
-        // $router->patch(
-        //     'transaction/{id:\d+}/amount',            
-        //     ['uses'=>'TransactionController@editTransaction']
-        // );
+        $router->patch(
+            'transaction/{id:\d+}/detail',
+            ['uses'=>'TransactionController@editTransactionDetail']
+        );
     }
 );
