@@ -128,9 +128,72 @@ class TransactionController extends Controller
                 );
             }
 
+            // If user is editing transaction
+            if ($method=='PATCH' && preg_match('/api\/transaction\/\d+\/(date_time|category|amount)/', $uri)) {
+                // If user wants to change date_time
+                if ($request->route('column') == 'date_time') {
+                    $this->validate(
+                        $request,
+                        [
+                            'data'=> [
+                                'bail',
+                                'required',
+                                'date'
+                            ]
+                        ]
+                    );
+
+                    $dateTime = date_create($request->data);
+                    $this->userInput = date_format($dateTime, 'Y:m:d G:i:s');
+                } elseif ($request->route('column') == 'category') {
+                    // If user wants to change category
+                    $this->validate(
+                        $request,
+                        [
+                            'data'=> [
+                                'bail',
+                                'required',
+                                'int',
+                                function ($attribute, $value, $fail) {
+                                    $category = new Category;
+                                    $category = $category->find($value);
+    
+                                    if (!$category) {
+                                        $fail("Category does not exist");
+                                    }
+                                }
+
+                            ]
+                        ]
+                    );
+                    $this->userInput = (INT)$request->data;
+                } elseif ($request->route('column') == 'amount') {
+                    // If user wants to change amount
+                    $this->validate(
+                        $request,
+                        [
+                            'data' =>[
+                                'bail',
+                                'required',
+                                'numeric',
+                                function ($attribute, $value, $fail) {
+                                    if (!is_int((INT)$value) || !is_double((DOUBLE)$value) ||
+                                    !is_float((FLOAT)$value)) {
+                                        $fail($attribute." is neither double or int");
+                                    }
+                                }
+                            ]
+                        ]
+                    );
+                    $this->userInput = (DOUBLE)$request->data;
+                }
+
+
+                // Id of transaction
                 $this->id = $request->route('id');
+                // Which column date_time, category or amount
                 $this->column = $request->route('column');
-                $this->userInput = $request->data;
+            }
             }
         } catch (\ValidationException $th) {
             return response($th->getMessage(), 422);
