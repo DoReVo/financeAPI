@@ -169,6 +169,7 @@ class TransactionController extends Controller
                 $transaction->item()->saveMany($itemArray);
             }
 
+            $transaction = $transaction->with(['detail','item'])->findOrFail($transaction->id);
             return $transaction;
         } catch (\Throwable $th) {
             return($th->getMessage());
