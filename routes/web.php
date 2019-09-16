@@ -36,5 +36,9 @@ $router->group(
             'transaction/{id:\d+}/detail',
             ['uses'=>'TransactionController@editTransactionDetail']
         );
+        $router->patch(
+            'transaction/{id:\d+}/item/{itemId:\d+}/{column:item_name|item_amount|unit_price}',
+            ['uses'=>'TransactionController@editTransactionItem']
+        );
     }
 );
