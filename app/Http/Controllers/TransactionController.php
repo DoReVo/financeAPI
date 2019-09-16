@@ -413,7 +413,60 @@ class TransactionController extends Controller
         $detail->detail = $this->detail;
         $detail->save();
         
-        return response($detail);
+    public function editTransactionItem(Request $request, $id, $itemId, $column)
+    {
+        try {
+            $transaction = new Transaction;
+            $transaction = $transaction->find($id);
+
+            // If Transaction ID does not exist
+            if (!$transaction) {
+                return response(
+                    json_encode(
+                        array(
+                        'message' => 'Transaction ID does not exist'
+                        )
+                    ),
+                    404
+                );
+            }
+
+            $item = new Item;
+            $item = $item->find($itemId);
+
+            // If item ID does not exist
+            if (!$item) {
+                return response(
+                    json_encode(
+                        array(
+                        'message' => 'Item ID does not exist'
+                        )
+                    ),
+                    404
+                );
+            }
+
+            // Set item detail to new value
+            $item[$this->column] = $this->userInput;
+            $item->save();
+
+            // Return success
+            return response(
+                json_encode(
+                    $item
+                ),
+                200
+            );
+        } catch (\Throwable $th) {
+            return response(
+                json_encode(
+                    array(
+                    'message' => 'Failed to edit item details'
+                    )
+                ),
+                400
+            );
+        }
     }
 
     public function replaceTransaction($id, Request $request)
