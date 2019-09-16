@@ -213,6 +213,54 @@ class TransactionController extends Controller
                 // $this->id = $request->id;
                 // $this->id = $request->route('id');
             }
+            // If user is editing item details
+            if ($method == 'PATCH' &&
+            preg_match('/api\/transaction\/\d+\/item\/\d+\/(item_name|item_amount|unit_price)/', $uri)) {
+                if ($request->route('column') == 'item_name') {
+                    $this->validate(
+                        $request,
+                        [
+                            'data' =>
+                            [
+                                'bail',
+                                'required',
+                                'string'
+                            ]
+                        ]
+                    );
+                    $this->userInput = (STRING)$request->data;
+                } elseif ($request->route('column') == 'item_amount') {
+                    $this->validate(
+                        $request,
+                        [
+                            'data'=>
+                            [
+                                'bail',
+                                'required',
+                                'numeric',
+                                'int',
+                                'gte:0'
+                            ]
+                        ]
+                    );
+                    $this->userInput = (INT)$request->data;
+                } elseif ($request->route('column') == 'unit_price') {
+                    $this->validate(
+                        $request,
+                        [
+                            'data'=>
+                            [
+                                'bail',
+                                'required',
+                                'numeric',
+                                'gte:0'
+                            ]
+                        ]
+                    );
+                    $this->userInput = (DOUBLE)$request->data;
+                }
+                $this->column = $request->route('column');
+            }
         } catch (\ValidationException $th) {
             return response($th->getMessage(), 422);
         }
