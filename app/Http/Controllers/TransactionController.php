@@ -101,6 +101,7 @@ class TransactionController extends Controller
                 $this->item = $request->item;
             }
 
+            // If user is adding item for existing transaction
             if ($method == 'POST' && preg_match('/api\/transaction\/\d+\/item/', $uri)) {
                 $this->validate(
                     $request,
@@ -268,23 +269,45 @@ class TransactionController extends Controller
 
     public function getAllTransaction()
     {
-        $transaction = new Transaction;
-        $transaction = $transaction->with(['detail','item'])->get();
-        
-        return($transaction);
+        try {
+            $transaction = new Transaction;
+            $transaction = $transaction->with(['detail','item'])->get();
+            
+            return response(
+                json_encode($transaction),
+                200
+            );
+        } catch (\Throwable $th) {
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Failed to retrieve transactions'
+                    )
+                ),
+                400
+            );
+        }
     }
 
     public function getOneTransaction($id)
     {
-        $transaction = new Transaction;
-
         try {
+            $transaction = new Transaction;
             $transaction = $transaction->with(['detail','item'])->findOrFail($id);
-            return(
-                $transaction
+
+            return response(
+                json_encode($transaction),
+                200
             );
         } catch (\Throwable $th) {
-            return response("Not Found", 404);
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Failed to retrieve transaction'
+                    )
+                ),
+                400
+            );
         }
     }
 
@@ -293,7 +316,7 @@ class TransactionController extends Controller
         try {
             $transaction = new Transaction;
 
-            // 5. SAVE TO DATABASE
+            //SAVE TO DATABASE
             $transaction->date_time = $this->date;
             $transaction->category = $this->category;
             $transaction->amount = $this->amount;
@@ -325,9 +348,20 @@ class TransactionController extends Controller
             }
 
             $transaction = $transaction->with(['detail','item'])->findOrFail($transaction->id);
-            return $transaction;
+
+            return response(
+                json_encode($transaction),
+                200
+            );
         } catch (\Throwable $th) {
-            return($th->getMessage());
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Failed to create transaction'
+                    )
+                ),
+                400
+            );
         }
     }
 
@@ -344,9 +378,19 @@ class TransactionController extends Controller
                 ]
             );
 
-            return response($item, 200);
+            return response(
+                json_encode($item),
+                200
+            );
         } catch (\Throwable $th) {
-            return($th->getMessage());
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Failed to create transaction item'
+                    )
+                ),
+                400
+            );
         }
     }
     public function deleteTransaction($id)
@@ -360,10 +404,17 @@ class TransactionController extends Controller
             $transaction->delete();
             $transaction->detail()->delete();
             $transaction->item()->delete();
-            return response("Delete Successfully");
+
+            return response(json_encode(array('message'=>"Delete Successfully")), 200);
         } catch (\Throwable $th) {
-            return $th->getMessage();
-            // return response("Fail To Delete");
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Failed to delete transaction'
+                    )
+                ),
+                400
+            );
         }
     }
 
@@ -376,7 +427,7 @@ class TransactionController extends Controller
 
             // Return error if ID not exist
             if (!$transaction) {
-                return response(json_encode('ID does not exist'), 422);
+                return response(json_encode('Transaction ID does not exist'), 404);
             }
 
             // Set new data on user defined column based on route
@@ -385,34 +436,55 @@ class TransactionController extends Controller
             $transaction->save();
 
             // Return updated value only
-            $updatedValue[$this->column] = $transaction[$this->column];
+            // $updatedValue[$this->column] = $transaction[$this->column];
 
-            return response($updatedValue);
+            return response(json_encode($transaction), 200);
             // return response($request->path());
         } catch (\Throwable $th) {
-            return $th->getMessage();
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Failed to edit transaction'
+                    )
+                ),
+                400
+            );
         }
     }
 
     // Transaction Detail editing
     public function editTransactionDetail(Request $request, $id)
     {
-        $this->id = $id;
-        $transaction = new Transaction;
-        $transaction = $transaction->find($id);
-
-        // If Id does not exist
-        if (!$transaction) {
-            return response(json_encode('ID does not exist'), 422);
-            // return $this->id;
+        try {
+            $this->id = $id;
+            $transaction = new Transaction;
+            $transaction = $transaction->find($id);
+    
+            // If Id does not exist
+            if (!$transaction) {
+                return response(json_encode('Transaction ID does not exist'), 404);
+                // return $this->id;
+            }
+    
+            $detail = new Detail;
+            $detail = $detail->find($id);
+    
+            $detail->detail = $this->detail;
+            $detail->save();
+            
+            return response(json_encode($detail), 200);
+        } catch (\Throwable $th) {
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Failed to edit transaction detail'
+                    )
+                ),
+                400
+            );
         }
+    }
 
-        $detail = new Detail;
-        $detail = $detail->find($id);
-
-        $detail->detail = $this->detail;
-        $detail->save();
-        
     public function editTransactionItem(Request $request, $id, $itemId, $column)
     {
         try {
@@ -469,6 +541,7 @@ class TransactionController extends Controller
         }
     }
 
+    // Unused for now
     public function replaceTransaction($id, Request $request)
     {
         // 1.ERROR HANDLING FOR DELETED RECORD
