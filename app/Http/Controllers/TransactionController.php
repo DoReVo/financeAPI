@@ -445,12 +445,28 @@ class TransactionController extends Controller
             $transaction->detail()->delete();
             $transaction->item()->delete();
 
-            return response(json_encode(array('message'=>"Delete Successfully")), 200);
+    public function deleteCategory($id)
+    {
+        $category = new Category;
+
+        try {
+            $category = $category->find($id);
+
+            $category->delete();
+
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Delete successfully',
+                    )
+                ),
+                200
+            );
         } catch (\Throwable $th) {
             return response(
                 json_encode(
                     array(
-                        'message' => 'Failed to delete transaction'
+                        'message' => 'Failed to delete category',
                     )
                 ),
                 400
