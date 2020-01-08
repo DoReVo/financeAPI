@@ -10,7 +10,7 @@ class Category extends Model
     protected $table = 'finance_category';
     protected $primaryKey = 'id';
 
-    public $timestamp = false;
+    public $timestamps = false;
 
     protected $fillable = [
     'category_name'
