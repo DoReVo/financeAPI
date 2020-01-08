@@ -125,8 +125,18 @@ class TransactionController extends Controller
                             'numeric',
                             'gte:0'
                         ]
+            if ($method == 'POST' && $uri == ('api/category')) {
+                $this->validate(
+                    $request,
+                    [
+                        'category_name' => [
+                            'required',
+                            'string',
+                        ],
                     ]
                 );
+
+                $this->userInput = $request->category_name;
             }
 
             // If user is editing transaction
