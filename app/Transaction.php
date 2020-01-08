@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Category;
-use App\Item;
 use App\Detail;
+use App\Item;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
@@ -18,8 +18,8 @@ class Transaction extends Model
     const UPDATED_AT = 'update_date';
 
     protected $fillable = [
-    'date_time',
-    'amount'
+        'date_time',
+        'amount',
     ];
 
     public function category()
