@@ -34,6 +34,14 @@ $router->group(
             'transaction/{id}',
             ['uses' => 'TransactionController@deleteTransaction']
         );
+        // Delete category
+
+        $router->delete(
+            'category/{id:\d+}',
+            ['uses' => 'TransactionController@deleteCategory']
+        );
+
+        // Edit transaction
         $router->patch(
             'transaction/{id:\d+}/{column:date_time|category|amount}',
             ['uses'=>'TransactionController@editTransaction']
