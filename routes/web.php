@@ -24,6 +24,12 @@ $router->group(
             'transaction/{id:\d+}/item',
             ['uses' => 'TransactionController@createTransactionItem']
         );
+        // Create a category
+        $router->post(
+            'category',
+            ['uses' => 'TransactionController@createCategory']
+        );
+        // Delete transaction
         $router->delete(
             'transaction/{id}',
             ['uses' => 'TransactionController@deleteTransaction']
