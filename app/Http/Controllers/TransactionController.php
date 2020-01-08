@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Transaction;
 use App\Category;
 use App\Detail;
 use App\Item;
+use App\Transaction;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
@@ -20,7 +18,7 @@ class TransactionController extends Controller
     private $column;
     private $id;
     private $userInput;
-
+    private $test;
 
     public function __construct(Request $request)
     {
@@ -35,12 +33,12 @@ class TransactionController extends Controller
                 $this->validate(
                     $request,
                     [
-                        'date_time'=>[
+                        'date_time' => [
                             'bail',
                             'required',
-                            'date'
+                            'date',
                         ],
-                        'category'=>[
+                        'category' => [
                             'bail',
                             'required',
                             'int',
@@ -51,46 +49,46 @@ class TransactionController extends Controller
                                 if (!$category) {
                                     $fail("Category does not exist");
                                 }
-                            }
+                            },
                         ],
-                        'amount' =>[
+                        'amount' => [
                             'bail',
                             'required',
                             'numeric',
                             function ($attribute, $value, $fail) {
-                                if (!is_int((INT)$value) || !is_double((DOUBLE)$value) || !is_float((FLOAT)$value)) {
-                                    $fail($attribute." is neither double or int");
+                                if (!is_int((INT) $value) || !is_double((DOUBLE) $value) || !is_float((FLOAT) $value)) {
+                                    $fail($attribute . " is neither double or int");
                                 }
-                            }
+                            },
                         ],
-                        'item' =>[
+                        'item' => [
                             'sometimes',
                         ],
-                        'item.*.item_name' =>[
+                        'item.*.item_name' => [
                             'bail',
                             'required',
-                            'string'
+                            'string',
                         ],
-                        'item.*.item_amount'=>[
+                        'item.*.item_amount' => [
                             'bail',
                             'required',
                             'numeric',
                             'int',
-                            'gte:0'
+                            'gte:0',
                         ],
-                        'item.*.unit_price'=>[
+                        'item.*.unit_price' => [
                             'bail',
                             'required',
                             'numeric',
-                            'gte:0'
+                            'gte:0',
                         ],
-                        'detail'=>[
+                        'detail' => [
                             'bail',
                             'sometimes',
                             'string',
-                            'nullable'
-                        ]
-                        ]
+                            'nullable',
+                        ],
+                    ]
                 );
 
                 $dateTime = date_create($request->date_time);
@@ -106,25 +104,30 @@ class TransactionController extends Controller
                 $this->validate(
                     $request,
                     [
-                        
-                        'item_name' =>[
+
+                        'item_name' => [
                             'bail',
                             'required',
-                            'string'
+                            'string',
                         ],
-                        'item_amount'=>[
+                        'item_amount' => [
                             'bail',
                             'required',
                             'numeric',
                             'int',
-                            'gte:0'
+                            'gte:0',
                         ],
-                        'unit_price'=>[
+                        'unit_price' => [
                             'bail',
                             'required',
                             'numeric',
-                            'gte:0'
-                        ]
+                            'gte:0',
+                        ],
+                    ]
+                );
+            }
+
+            // If user is adding category
             if ($method == 'POST' && $uri == ('api/category')) {
                 $this->validate(
                     $request,
@@ -140,17 +143,17 @@ class TransactionController extends Controller
             }
 
             // If user is editing transaction
-            if ($method=='PATCH' && preg_match('/api\/transaction\/\d+\/(date_time|category|amount)/', $uri)) {
+            if ($method == 'PATCH' && preg_match('/api\/transaction\/\d+\/(date_time|category|amount)/', $uri)) {
                 // If user wants to change date_time
                 if ($request->route('column') == 'date_time') {
                     $this->validate(
                         $request,
                         [
-                            'data'=> [
+                            'data' => [
                                 'bail',
                                 'required',
-                                'date'
-                            ]
+                                'date',
+                            ],
                         ]
                     );
 
@@ -161,44 +164,43 @@ class TransactionController extends Controller
                     $this->validate(
                         $request,
                         [
-                            'data'=> [
+                            'data' => [
                                 'bail',
                                 'required',
                                 'int',
                                 function ($attribute, $value, $fail) {
                                     $category = new Category;
                                     $category = $category->find($value);
-    
+
                                     if (!$category) {
                                         $fail("Category does not exist");
                                     }
-                                }
+                                },
 
-                            ]
+                            ],
                         ]
                     );
-                    $this->userInput = (INT)$request->data;
+                    $this->userInput = (INT) $request->data;
                 } elseif ($request->route('column') == 'amount') {
                     // If user wants to change amount
                     $this->validate(
                         $request,
                         [
-                            'data' =>[
+                            'data' => [
                                 'bail',
                                 'required',
                                 'numeric',
                                 function ($attribute, $value, $fail) {
-                                    if (!is_int((INT)$value) || !is_double((DOUBLE)$value) ||
-                                    !is_float((FLOAT)$value)) {
-                                        $fail($attribute." is neither double or int");
+                                    if (!is_int((INT) $value) || !is_double((DOUBLE) $value) ||
+                                        !is_float((FLOAT) $value)) {
+                                        $fail($attribute . " is neither double or int");
                                     }
-                                }
-                            ]
+                                },
+                            ],
                         ]
                     );
-                    $this->userInput = (DOUBLE)$request->data;
+                    $this->userInput = (DOUBLE) $request->data;
                 }
-
 
                 // Id of transaction
                 $this->id = $request->route('id');
@@ -211,12 +213,12 @@ class TransactionController extends Controller
                 $this->validate(
                     $request,
                     [
-                        'data'=>[
+                        'data' => [
                             'bail',
                             'required',
                             'string',
-                            'nullable'
-                        ]
+                            'nullable',
+                        ],
                     ]
                 );
 
@@ -226,7 +228,7 @@ class TransactionController extends Controller
             }
             // If user is editing item details
             if ($method == 'PATCH' &&
-            preg_match('/api\/transaction\/\d+\/item\/\d+\/(item_name|item_amount|unit_price)/', $uri)) {
+                preg_match('/api\/transaction\/\d+\/item\/\d+\/(item_name|item_amount|unit_price)/', $uri)) {
                 if ($request->route('column') == 'item_name') {
                     $this->validate(
                         $request,
@@ -235,43 +237,45 @@ class TransactionController extends Controller
                             [
                                 'bail',
                                 'required',
-                                'string'
-                            ]
+                                'string',
+                            ],
                         ]
                     );
-                    $this->userInput = (STRING)$request->data;
+                    $this->userInput = (STRING) $request->data;
                 } elseif ($request->route('column') == 'item_amount') {
                     $this->validate(
                         $request,
                         [
-                            'data'=>
+                            'data' =>
                             [
                                 'bail',
                                 'required',
                                 'numeric',
                                 'int',
-                                'gte:0'
-                            ]
+                                'gte:0',
+                            ],
                         ]
                     );
-                    $this->userInput = (INT)$request->data;
+                    $this->userInput = (INT) $request->data;
                 } elseif ($request->route('column') == 'unit_price') {
                     $this->validate(
                         $request,
                         [
-                            'data'=>
+                            'data' =>
                             [
                                 'bail',
                                 'required',
                                 'numeric',
-                                'gte:0'
-                            ]
+                                'gte:0',
+                            ],
                         ]
                     );
-                    $this->userInput = (DOUBLE)$request->data;
+                    $this->userInput = (DOUBLE) $request->data;
                 }
                 $this->column = $request->route('column');
             }
+
+            // If user is editing category
             if ($method == 'PATCH' && $uri == preg_match('/api\/category\/\d+/', $uri)) {
                 $this->validate(
                     $request,
@@ -290,8 +294,8 @@ class TransactionController extends Controller
     {
         try {
             $transaction = new Transaction;
-            $transaction = $transaction->with(['detail','item'])->get();
-            
+            $transaction = $transaction->with(['detail', 'item'])->get();
+
             return response(
                 json_encode($transaction),
                 200
@@ -300,7 +304,7 @@ class TransactionController extends Controller
             return response(
                 json_encode(
                     array(
-                        'message' => 'Failed to retrieve transactions'
+                        'message' => 'Failed to retrieve transactions',
                     )
                 ),
                 400
@@ -312,7 +316,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = new Transaction;
-            $transaction = $transaction->with(['detail','item'])->findOrFail($id);
+            $transaction = $transaction->with(['detail', 'item'])->findOrFail($id);
 
             return response(
                 json_encode($transaction),
@@ -322,7 +326,7 @@ class TransactionController extends Controller
             return response(
                 json_encode(
                     array(
-                        'message' => 'Failed to retrieve transaction'
+                        'message' => 'Failed to retrieve transaction',
                     )
                 ),
                 400
@@ -344,17 +348,16 @@ class TransactionController extends Controller
             $transaction->save();
 
             // finance_transaction_detail table
-            
+
             $detail = new Detail;
             $detail->detail = $this->detail ? $this->detail : null;
             $transaction->detail()->save($detail);
-            
 
             //finance_transaction_item table
 
             if ($this->item) {
                 $itemArray = array();
-    
+
                 foreach ($this->item as $rowKey => $rowValue) {
                     $item = new Item;
                     foreach ($this->item[$rowKey] as $colKey => $colValue) {
@@ -362,21 +365,21 @@ class TransactionController extends Controller
                     }
                     array_push($itemArray, $item);
                 }
-    
+
                 $transaction->item()->saveMany($itemArray);
             }
 
-            $transaction = $transaction->with(['detail','item'])->findOrFail($transaction->id);
+            $transaction = $transaction->with(['detail', 'item'])->findOrFail($transaction->id);
 
             return response(
                 json_encode($transaction),
-                200
+                201
             );
         } catch (\Throwable $th) {
             return response(
                 json_encode(
                     array(
-                        'message' => 'Failed to create transaction'
+                        'message' => 'Failed to create transaction',
                     )
                 ),
                 400
@@ -393,25 +396,26 @@ class TransactionController extends Controller
                     'transaction_id' => $id,
                     'item_name' => $request->item_name,
                     'item_amount' => $request->item_amount,
-                    'unit_price' => $request->unit_price
+                    'unit_price' => $request->unit_price,
                 ]
             );
 
             return response(
                 json_encode($item),
-                200
+                201
             );
         } catch (\Throwable $th) {
             return response(
                 json_encode(
                     array(
-                        'message' => 'Failed to create transaction item'
+                        'message' => 'Failed to create transaction item',
                     )
                 ),
                 400
             );
         }
     }
+
     public function createCategory(Request $request)
     {
         try {
@@ -433,17 +437,31 @@ class TransactionController extends Controller
             );
         }
     }
+
     public function deleteTransaction($id)
     {
         $transaction = new Transaction;
 
         try {
-            $transaction = $transaction->with(['detail','item'])->findOrFail($id);
+            $transaction = $transaction->with(['detail', 'item'])->findOrFail($id);
 
             // FIND MORE ELEGANT CODE LATER
             $transaction->delete();
             $transaction->detail()->delete();
             $transaction->item()->delete();
+
+            return response(json_encode(array('message' => "Delete Successfully")), 200);
+        } catch (\Throwable $th) {
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Failed to delete transaction',
+                    )
+                ),
+                400
+            );
+        }
+    }
 
     public function deleteCategory($id)
     {
@@ -488,7 +506,7 @@ class TransactionController extends Controller
 
             // Set new data on user defined column based on route
             $transaction[$this->column] = $this->userInput;
-            
+
             $transaction->save();
 
             // Return updated value only
@@ -500,7 +518,7 @@ class TransactionController extends Controller
             return response(
                 json_encode(
                     array(
-                        'message' => 'Failed to edit transaction'
+                        'message' => 'Failed to edit transaction',
                     )
                 ),
                 400
@@ -515,25 +533,25 @@ class TransactionController extends Controller
             $this->id = $id;
             $transaction = new Transaction;
             $transaction = $transaction->find($id);
-    
+
             // If Id does not exist
             if (!$transaction) {
                 return response(json_encode('Transaction ID does not exist'), 404);
                 // return $this->id;
             }
-    
+
             $detail = new Detail;
             $detail = $detail->find($id);
-    
+
             $detail->detail = $this->detail;
             $detail->save();
-            
+
             return response(json_encode($detail), 200);
         } catch (\Throwable $th) {
             return response(
                 json_encode(
                     array(
-                        'message' => 'Failed to edit transaction detail'
+                        'message' => 'Failed to edit transaction detail',
                     )
                 ),
                 400
@@ -552,7 +570,7 @@ class TransactionController extends Controller
                 return response(
                     json_encode(
                         array(
-                        'message' => 'Transaction ID does not exist'
+                            'message' => 'Transaction ID does not exist',
                         )
                     ),
                     404
@@ -567,7 +585,7 @@ class TransactionController extends Controller
                 return response(
                     json_encode(
                         array(
-                        'message' => 'Item ID does not exist'
+                            'message' => 'Item ID does not exist',
                         )
                     ),
                     404
@@ -589,7 +607,7 @@ class TransactionController extends Controller
             return response(
                 json_encode(
                     array(
-                    'message' => 'Failed to edit item details'
+                        'message' => 'Failed to edit item details',
                     )
                 ),
                 400
@@ -634,7 +652,7 @@ class TransactionController extends Controller
 
             $transaction->update(
                 ['date_time' => $this->date,
-                'amount' => $request->amount]
+                    'amount' => $request->amount]
             );
 
             return response($transaction);
