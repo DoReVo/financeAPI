@@ -412,6 +412,27 @@ class TransactionController extends Controller
             );
         }
     }
+    public function createCategory(Request $request)
+    {
+        try {
+            $category = new Category;
+            $category->category_name = $this->userInput;
+
+            $category->save();
+
+            return response(
+                json_encode($category),
+                201
+            );
+        } catch (\Throwable $th) {
+            return response(
+                json_encode(array(
+                    'message' => 'Failed to create category',
+                )),
+                400
+            );
+        }
+    }
     public function deleteTransaction($id)
     {
         $transaction = new Transaction;
