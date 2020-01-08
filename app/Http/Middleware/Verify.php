@@ -17,13 +17,13 @@ class Verify
     {
 
         try {
-            if ($request->test!='pass') {
-                return response($request->input('id').' Is your id', 404);
+            if ($request->password != 'pass') {
+                // return response($request->input('id').' Is your id', 404);
+                return response($request->bearerToken(), 200);
             }
         } catch (\Throwable $th) {
             return response($th->getMessage());
         }
-        
 
         return $next($request);
     }
