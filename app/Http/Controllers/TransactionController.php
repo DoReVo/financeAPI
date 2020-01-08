@@ -272,6 +272,15 @@ class TransactionController extends Controller
                 }
                 $this->column = $request->route('column');
             }
+            if ($method == 'PATCH' && $uri == preg_match('/api\/category\/\d+/', $uri)) {
+                $this->validate(
+                    $request,
+                    ['data' =>
+                        'required',
+                        'string',
+                    ]
+                );
+            }
         } catch (\ValidationException $th) {
             return response($th->getMessage(), 422);
         }
