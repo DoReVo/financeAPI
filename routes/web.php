@@ -52,7 +52,10 @@ $router->group(
         );
         $router->patch(
             'transaction/{id:\d+}/item/{itemId:\d+}/{column:item_name|item_amount|unit_price}',
-            ['uses'=>'TransactionController@editTransactionItem']
+        //Edit Category
+        $router->patch(
+            'category/{id:\d+}',
+            ['uses' => 'TransactionController@editCategory']
         );
     }
 );
