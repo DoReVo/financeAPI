@@ -6,7 +6,7 @@ $router->get('/', function () use ($router) {
 
 
 $router->group(
-    ['prefix'=>'api/'],
+    ['prefix'=>'api/','middleware' => 'cors'],
     function () use ($router) {
         $router->get(
             'transaction',
