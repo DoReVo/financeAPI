@@ -597,6 +597,32 @@ class TransactionController extends Controller
         }
     }
 
+    public function editCategory(Request $request, $id)
+    {
+
+        try {
+            $category = new Category;
+            $category = $category->find($id);
+
+            if (!$category) {
+                return response(
+                    json_encode(array('message' => 'Category ID does not exist')),
+                    404
+                );
+            }
+
+            $category->category_name = $request->data;
+
+            $category->save();
+
+            return response(json_encode($category), 200);
+        } catch (\Throwable $th) {
+            return response(json_encode(array('message' => 'Failed to edit category name')));
+            // return $th->getMessage();
+            // return $request->data;
+        }
+    }
+
     // Unused for now
     public function replaceTransaction($id, Request $request)
     {
