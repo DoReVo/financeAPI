@@ -5,7 +5,7 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group(
-    ['prefix' => 'api/', 'middleware' => 'verify', 'cors'],
+    ['prefix' => 'api/', 'middleware' => ['auth', 'cors']],
     function () use ($router) {
         // Get all transaction
         $router->get(
