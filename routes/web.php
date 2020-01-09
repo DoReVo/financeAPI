@@ -66,3 +66,8 @@ $router->group(
         );
     }
 );
+
+$router->post(
+    'login',
+    ['uses'=>'UserController@login']
+);
