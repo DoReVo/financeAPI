@@ -20,15 +20,35 @@ class JwtAuth
 
     public function handle($request, Closure $next)
     {
-      $key = 'keyPair';
+      // Public Key from env
+        $publicKey = getenv('JWT_PUBLIC_KEY');
 
-      $token= $request->input('jwtToken');
+        $token = $request->bearerToken();
  
-       try{
+        if (!$token) {
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'Unauthorized request',
+                    )
+                ),
+                401
+            );
+        }
          
-         $decoded = JWT::decode($token, $key, array('HS256'));
+        try {
+            $decoded = JWT::decode($token, $publicKey, array('RS256'));
          return $next($request);
-       
+        } catch (\Exception $e) {
+            return response(
+                json_encode(
+                    array(
+                        'message' => 'No permission',
+                    )
+                ),
+                403
+            );
+            // return $e->getMessage();
        }
        catch(\Exception $e){
          // echo 'FAILED';
